@@ -32,21 +32,23 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: Text(title),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pushNamed('/esc'),
-            child: Text('Tab, Esc and Shift Esc'),
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pushNamed('/enter'),
-            child: Text('Tab, Esc and Enter'),
-          ),
-        ],
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pushNamed('/esc'),
+              child: Text('Tab, Esc and Shift Esc'),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pushNamed('/enter'),
+              child: Text('Tab, Esc and Enter'),
+            ),
+          ],
+        ),
       ),
     );
   }
