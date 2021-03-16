@@ -68,75 +68,80 @@ class _EscapeEnterPageState extends State<EscapeEnterPage>
               child: Text('Button1'),
               onPressed: () {},
             ),
-            Actions(
-              actions: {
-                IndentIntent: IndentationAction(),
-                DedentIntent: DedentationAction(),
-                ExitTabFocusIntent: ExitTabFocusAction(),
-                EnterTabFocusIntent: EnterTabFocusAction(),
-              },
-              child: Shortcuts(
-                shortcuts: {
-                  if (!textFieldFocus.hasFocus)
-                    LogicalKeySet(LogicalKeyboardKey.enter):
-                        EnterTabFocusIntent(
-                            textFieldFocus, textFieldFocusEnabled)
-                },
-                child: Builder(builder: (context) {
-                  return GestureDetector(
+            Builder(
+              builder: (context) {
+                return Actions(
+                  actions: {
+                    IndentIntent: IndentationAction(),
+                    DedentIntent: DedentationAction(),
+                    ExitTabFocusIntent: ExitTabFocusAction(),
+                    EnterTabFocusIntent: EnterTabFocusAction(),
+                  },
+                  child: GestureDetector(
                     onTap: () {
+                      print('Tap');
                       return Actions.invoke(
                           context,
                           EnterTabFocusIntent(
                               textFieldFocus, textFieldFocusEnabled));
                     },
-                    child: Container(
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color:
-                              outerFocus.hasFocus ? Colors.blue : Colors.black,
-                        ),
-                      ),
+                    child: Shortcuts(
+                      shortcuts: {
+                        if (!textFieldFocus.hasFocus)
+                          LogicalKeySet(LogicalKeyboardKey.enter):
+                              EnterTabFocusIntent(
+                                  textFieldFocus, textFieldFocusEnabled)
+                      },
                       child: Container(
+                        padding: EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           border: Border.all(
-                            color: textFieldFocusEnabled.value
-                                ? Colors.green
+                            color: outerFocus.hasFocus
+                                ? Colors.blue
                                 : Colors.black,
                           ),
                         ),
-                        child: Focus(
-                          focusNode: outerFocus,
-                          descendantsAreFocusable: textFieldFocusEnabled.value,
-                          child: Shortcuts(
-                            shortcuts: textFieldFocus.hasFocus
-                                ? {
-                                    LogicalKeySet(LogicalKeyboardKey.tab):
-                                        IndentIntent(textController),
-                                    LogicalKeySet(LogicalKeyboardKey.shift,
-                                            LogicalKeyboardKey.tab):
-                                        DedentIntent(textController),
-                                    LogicalKeySet(LogicalKeyboardKey.escape):
-                                        ExitTabFocusIntent(textFieldFocus,
-                                            textFieldFocusEnabled),
-                                  }
-                                : {},
-                            child: TextField(
-                              autofocus: true,
-                              focusNode: textFieldFocus,
-                              controller: textController,
-                              textInputAction: TextInputAction.newline,
-                              maxLines: 30,
-                              keyboardType: TextInputType.multiline,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: textFieldFocusEnabled.value
+                                  ? Colors.green
+                                  : Colors.black,
+                            ),
+                          ),
+                          child: Focus(
+                            focusNode: outerFocus,
+                            descendantsAreFocusable:
+                                textFieldFocusEnabled.value,
+                            child: Shortcuts(
+                              shortcuts: textFieldFocus.hasFocus
+                                  ? {
+                                      LogicalKeySet(LogicalKeyboardKey.tab):
+                                          IndentIntent(textController),
+                                      LogicalKeySet(LogicalKeyboardKey.shift,
+                                              LogicalKeyboardKey.tab):
+                                          DedentIntent(textController),
+                                      LogicalKeySet(LogicalKeyboardKey.escape):
+                                          ExitTabFocusIntent(textFieldFocus,
+                                              textFieldFocusEnabled),
+                                    }
+                                  : {},
+                              child: TextField(
+                                autofocus: true,
+                                focusNode: textFieldFocus,
+                                controller: textController,
+                                textInputAction: TextInputAction.newline,
+                                maxLines: 30,
+                                keyboardType: TextInputType.multiline,
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  );
-                }),
-              ),
+                  ),
+                );
+              },
             ),
             ElevatedButton(
               child: Text('Button2'),

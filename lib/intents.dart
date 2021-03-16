@@ -3,9 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 class IndentIntent extends Intent {
-  const IndentIntent(this.textController, {this.inline = true});
+  const IndentIntent(this.textController);
   final TextEditingController textController;
-  final bool inline;
 }
 
 class DedentIntent extends Intent {
@@ -16,9 +15,35 @@ class DedentIntent extends Intent {
 class IndentationAction extends Action<IndentIntent> {
   @override
   Object invoke(covariant IndentIntent intent) {
-    if (intent.inline) {
-      final oldValue = intent.textController.value;
-      final newComposing = TextRange.collapsed(oldValue.composing.start);
+    final oldValue = intent.textController.value;
+    final newComposing = TextRange.collapsed(oldValue.composing.start);
+    final postSelection = oldValue.selection.isValid
+        ? oldValue.selection.textAfter(oldValue.text)
+        : '';
+    final selectedText = oldValue.selection.isValid
+        ? oldValue.selection.textInside(oldValue.text)
+        : '';
+    if (selectedText.contains('\n')) {
+      var newSelectedText = selectedText.replaceAll('\n', '\n\t');
+      if (oldValue.selection.base.offset == 0 ||
+          oldValue.text[oldValue.selection.base.offset - 2] == '\n') {
+        newSelectedText = '\t' + newSelectedText;
+      }
+      final newSelection = TextSelection(
+          baseOffset: oldValue.selection.start,
+          extentOffset: oldValue.selection.start + newSelectedText.length);
+
+      final newText = StringBuffer(oldValue.selection.isValid
+          ? oldValue.selection.textBefore(oldValue.text)
+          : oldValue.text);
+      newText.write(newSelectedText);
+      newText.write(postSelection);
+      intent.textController.value = intent.textController.value.copyWith(
+        composing: newComposing,
+        text: newText.toString(),
+        selection: newSelection,
+      );
+    } else {
       final newSelection =
           TextSelection.collapsed(offset: oldValue.selection.start + 1);
 
@@ -26,16 +51,12 @@ class IndentationAction extends Action<IndentIntent> {
           ? oldValue.selection.textBefore(oldValue.text)
           : oldValue.text);
       newText.write('\t');
-      newText.write(oldValue.selection.isValid
-          ? oldValue.selection.textAfter(oldValue.text)
-          : '');
+      newText.write(postSelection);
       intent.textController.value = intent.textController.value.copyWith(
         composing: newComposing,
         text: newText.toString(),
         selection: newSelection,
       );
-    } else {
-      // TODO: Indent at beginning of line of each line that is part of selection
     }
 
     return '';
@@ -45,8 +66,36 @@ class IndentationAction extends Action<IndentIntent> {
 class DedentationAction extends Action<DedentIntent> {
   @override
   Object invoke(covariant DedentIntent intent) {
-    // TODO: Dedent at beginning of line of each line that is part of selection
+    final oldValue = intent.textController.value;
+    final newComposing = TextRange.collapsed(oldValue.composing.start);
+    final postSelection = oldValue.selection.isValid
+        ? oldValue.selection.textAfter(oldValue.text)
+        : '';
+    final selectedText = oldValue.selection.isValid
+        ? oldValue.selection.textInside(oldValue.text)
+        : '';
+    if (selectedText.contains('\n\t')) {
+      var newSelectedText = selectedText.replaceAll('\n\t', '\n');
+      if (selectedText.startsWith('\t') &&
+          (oldValue.selection.base.offset == 0 ||
+              oldValue.text[oldValue.selection.base.offset - 2] == '\n')) {
+        newSelectedText = newSelectedText.substring(1);
+      }
+      final newSelection = TextSelection(
+          baseOffset: oldValue.selection.start,
+          extentOffset: oldValue.selection.start + newSelectedText.length);
 
+      final newText = StringBuffer(oldValue.selection.isValid
+          ? oldValue.selection.textBefore(oldValue.text)
+          : oldValue.text);
+      newText.write(newSelectedText);
+      newText.write(postSelection);
+      intent.textController.value = intent.textController.value.copyWith(
+        composing: newComposing,
+        text: newText.toString(),
+        selection: newSelection,
+      );
+    }
     return '';
   }
 }
